@@ -390,3 +390,37 @@ def weekly_summary():
         "trend": trend,
         "summary": f"Health is {trend} this week"
     }
+
+@app.get("/api/crop-growth")
+def get_crop_growth(crop: str = "wheat"):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    
+    # Find the very first entry for this crop to determine "Planting Date"
+    cursor.execute("SELECT MIN(timestamp) FROM predictions WHERE crop = ?", (crop,))
+    first_date_str = cursor.fetchone()[0]
+    conn.close()
+
+    if not first_date_str:
+        return {"stage": "Unknown", "days": 0, "progress": 0}
+
+    # Calculate days passed
+    first_date = datetime.strptime(first_date_str, '%Y-%m-%d %H:%M:%S')
+    days_passed = (datetime.now() - first_date).days
+
+    # Logic for Wheat (Total approx 120 days)
+    if days_passed < 15:
+        stage, progress = "🌱 Germination", (days_passed / 15) * 100
+    elif days_passed < 50:
+        stage, progress = "🌿 Vegetative Growth", (days_passed / 50) * 100
+    elif days_passed < 90:
+        stage, progress = "🌾 Heading / Flowering", (days_passed / 90) * 100
+    else:
+        stage, progress = "🚜 Ripening / Harvest", 100
+
+    return {
+        "stage": stage,
+        "days": days_passed,
+        "progress": round(progress, 1),
+        "total_expected_days": 120
+    }    
