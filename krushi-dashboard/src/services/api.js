@@ -9,7 +9,8 @@ export const getHistory = () => API.get("/api/history");
 export const getStats = () => API.get("/api/stats");
 export const getAnalytics = () => API.get("/api/analytics");
 export const getInsights = () => API.get("/api/insights");
-export const getWaterEfficiency = () =>
-  API.get("/api/water-efficiency");
-export const getWeeklySummary = () =>
-  API.get("/api/weekly-summary");
+export const getWaterEfficiency = () => API.get("/api/water-efficiency");
+export const getWeeklySummary = () => API.get("/api/weekly-summary");
+
+// FIXED: Uses the 'API' instance and matches your FastAPI route
+export const getCropGrowth = () => API.get("/api/crop-growth");

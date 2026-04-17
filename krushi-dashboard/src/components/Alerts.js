@@ -1,68 +1,52 @@
 import React from "react";
+import { AlertCircle, AlertTriangle, CheckCircle } from "lucide-react";
 
-function Alerts({ insights }) {
-  if (!insights) return null;
-
-  const alerts = [];
-
-  if (insights.stress_level === "HIGH") {
-    alerts.push({
-      level: "HIGH",
-      message: "🔥 Heat stress detected — irrigate immediately"
-    });
+const getAlertConfig = (level) => {
+  switch (level) {
+    case "HIGH": return { color: "#ef4444", icon: <AlertCircle size={20} /> };
+    case "MEDIUM": return { color: "#f59e0b", icon: <AlertTriangle size={20} /> };
+    default: return { color: "#22c55e", icon: <CheckCircle size={20} /> };
   }
+};
 
-  if (insights.drying_status === "FAST DRYING") {
-    alerts.push({
-      level: "MEDIUM",
-      message: "🌱 Soil drying too fast"
-    });
-  }
-
-  if (insights.water_estimate_liters > 100) {
-    alerts.push({
-      level: "MEDIUM",
-      message: "💧 High water usage detected"
-    });
-  }
-
-  if (alerts.length === 0) {
-    alerts.push({
-      level: "LOW",
-      message: "✅ All systems stable"
-    });
-  }
+function Alerts({ insights, theme }) {
+  if (!insights || !insights.alerts) return null;
 
   return (
-    <div style={styles.box}>
-      <h3>🚨 Smart Alerts</h3>
+    <div style={{ marginTop: "25px" }}>
+      <h3 style={{ color: theme.text, marginBottom: "15px", display: "flex", alignItems: "center", gap: "8px", fontSize: "18px" }}>
+        <AlertCircle size={20} color={theme.accent} /> Live Notifications
+      </h3>
 
-      {alerts.map((a, i) => (
-        <div key={i} style={{ ...styles.alert, borderLeftColor: color(a.level) }}>
-          {a.message}
-        </div>
-      ))}
+      {insights.alerts.map((alert, index) => {
+        const config = getAlertConfig(alert.level);
+        return (
+          <div
+            key={index}
+            style={{
+              background: theme.darkMode ? "#1e293b" : "white",
+              color: theme.text,
+              borderLeft: `5px solid ${config.color}`,
+              borderTop: `1px solid ${theme.border}`,
+              borderRight: `1px solid ${theme.border}`,
+              borderBottom: `1px solid ${theme.border}`,
+              padding: "16px 20px",
+              borderRadius: "12px",
+              marginBottom: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              fontWeight: "500",
+              boxShadow: theme.darkMode ? "none" : "0 2px 4px rgba(0,0,0,0.02)"
+            }}
+          >
+            <span style={{ color: config.color }}>{config.icon}</span>
+            {alert.message}
+          </div>
+        );
+      })}
     </div>
   );
 }
-
-const color = (l) =>
-  l === "HIGH" ? "#ef4444" : l === "MEDIUM" ? "#f59e0b" : "#22c55e";
-
-const styles = {
-  box: {
-    background: "#111827",
-    padding: "15px",
-    borderRadius: "12px",
-    border: "1px solid #1f2937"
-  },
-  alert: {
-    padding: "10px",
-    marginTop: "10px",
-    borderLeft: "4px solid",
-    background: "#0b1220",
-    borderRadius: "6px"
-  }
-};
 
 export default Alerts;
