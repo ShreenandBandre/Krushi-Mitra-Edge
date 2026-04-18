@@ -86,29 +86,40 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Included getCropGrowth in the parallel fetch
-        const [l, s, a, i, e, w, g] = await Promise.all([
-          getLatest(), getStats(), getAnalytics(), 
-          getInsights(), getWaterEfficiency(), getWeeklySummary(),
-          getCropGrowth() 
-        ]);
-        
-        setData({ 
-          latest: l.data, stats: s.data, analytics: a.data, 
-          insights: i.data, efficiency: e.data, weekly: w.data 
-        });
-        setGrowth(g.data); // Set the growth data
-        setLoading(false);
-      } catch (err) { 
-        console.error("Dashboard Fetch Error:", err); 
-      }
-    };
-    fetchData();
-    const interval = setInterval(fetchData, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  const fetchData = async () => {
+    try {
+      const [l, s, a, i, e, w, g] = await Promise.all([
+        getLatest(),
+        getStats(),
+        getAnalytics(),
+        getInsights(),
+        getWaterEfficiency(),
+        getWeeklySummary(),
+        getCropGrowth()
+      ]);
+
+      setData({
+        latest: l,
+        stats: s,
+        analytics: a,
+        insights: i,
+        efficiency: e,
+        weekly: w
+      });
+
+      setGrowth(g);
+      setLoading(false);
+    } catch (err) {
+      console.error("Dashboard Fetch Error:", err);
+    }
+  };
+
+  fetchData();
+
+  const interval = setInterval(fetchData, 10000);
+
+  return () => clearInterval(interval);
+}, []);
 
   if (loading) return (
     <div style={{ 
